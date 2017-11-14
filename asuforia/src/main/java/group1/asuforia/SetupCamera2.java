@@ -23,6 +23,7 @@ import java.util.Collections;
  * Created by vrajdelhivala on 11/14/17.
  */
 
+//some try catch exceptions yet to done and the application assumes that you have given permissions
 public class SetupCamera2
 {
     CameraManager cameraManager;
@@ -42,6 +43,7 @@ public class SetupCamera2
     static {
         System.loadLibrary("asuforia");
     }
+
 
     public void setup(TextureView textureView,Context ctx)
     {
