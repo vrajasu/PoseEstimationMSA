@@ -2,6 +2,7 @@ package group1.asuforia;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -10,20 +11,24 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
  * Created by vrajdelhivala on 11/14/17.
  */
 
-//some try catch exceptions yet to done and the application assumes that you have given permissions
+//some try catch exceptions yet to done and the application assumes that you have given permissions 
 public class SetupCamera2
 {
     CameraManager cameraManager;
@@ -39,21 +44,27 @@ public class SetupCamera2
     TextureView textureView;
     CaptureRequest.Builder captureRequestBuilder;
     CaptureRequest captureRequest;
+    ImageReader imageReader;
+    int imageFormat = ImageFormat.YUV_420_888;
+    PoseListener poseListener;
 
     static {
         System.loadLibrary("asuforia");
     }
 
 
-    public void setup(TextureView textureView,Context ctx)
+    public void setup(TextureView textureView, Context ctx, final PoseListener poseListener)
     {
         this.textureView=textureView;
         this.ctx =ctx;
+        this.poseListener = poseListener;
+
         cameraManager = (CameraManager) ctx.getSystemService(Context.CAMERA_SERVICE);
 
         surfaceTextureListener = new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+                poseListener.textureAvailable();
                 setUpCamera();
                 openCamera();
             }
@@ -102,6 +113,8 @@ public class SetupCamera2
                     StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(
                             CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
+                    imageReader = ImageReader.newInstance(previewSize.getWidth(),previewSize.getHeight(),imageFormat,5);
+                    imageReader.setOnImageAvailableListener(onImageAvailableListener,backgroundHandler);
                     this.cameraId = cameraId;
                 }
             }
@@ -130,9 +143,10 @@ public class SetupCamera2
             surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
             captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            captureRequestBuilder.addTarget(previewSurface);
+//            captureRequestBuilder.addTarget(previewSurface);
+            captureRequestBuilder.addTarget(imageReader.getSurface());
 
-            mCameraDevice.createCaptureSession(Collections.singletonList(previewSurface),
+            mCameraDevice.createCaptureSession(Arrays.asList(imageReader.getSurface()),
                     new CameraCaptureSession.StateCallback() {
 
                         @Override
@@ -160,6 +174,23 @@ public class SetupCamera2
             e.printStackTrace();
         }
     }
+    private final ImageReader.OnImageAvailableListener onImageAvailableListener
+            = new ImageReader.OnImageAvailableListener() {
+
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+
+
+            Log.d("image count","1");
+            Image img= reader.acquireNextImage();
+            poseListener.onPose(img);
+
+            img.close();
+
+
+        }
+
+    };
 
 
      public void onForeground() {
@@ -186,6 +217,10 @@ public class SetupCamera2
         if (mCameraDevice != null) {
             mCameraDevice.close();
             mCameraDevice = null;
+        }
+        if(imageReader!=null){
+            imageReader.close();
+            imageReader=null;
         }
     }
 
