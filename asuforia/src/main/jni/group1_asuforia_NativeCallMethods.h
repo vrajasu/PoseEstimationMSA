@@ -13,9 +13,12 @@ extern "C" {
  * Method:    getHelloNative
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_group1_asuforia_NativeCallMethods_getHelloNative
-  (JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_group1_asuforia_NativeCallMethods_generateReferenceImage(JNIEnv *env, jclass type,jstring path);
 
+JNIEXPORT jfloatArray JNICALL
+Java_group1_asuforia_NativeCallMethods_nativePoseEstimation(JNIEnv *env, jclass type, jint width,
+                                                            jint height, jobject buffer);
 #ifdef __cplusplus
 }
 #endif

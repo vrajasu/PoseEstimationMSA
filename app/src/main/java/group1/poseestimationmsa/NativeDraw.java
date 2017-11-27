@@ -20,7 +20,12 @@ public class NativeDraw {
     {
         drawNative(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer(),surface);
     }
+    public static void drawPose(Image img, Surface surface, float[] rvec, float[] tvec) {
+        drawNativePose(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer(),surface,rvec,tvec);
+    }
 
     public static native void drawNative(int width, int height, ByteBuffer buffer, Surface surface);
+    public static native void drawNativePose(int width, int height, ByteBuffer buffer, Surface surface,float[] rvec, float[] tvec);
+
 
 }

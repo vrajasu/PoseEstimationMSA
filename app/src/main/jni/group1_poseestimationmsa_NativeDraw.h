@@ -19,6 +19,12 @@ JNIEXPORT void JNICALL
 Java_group1_poseestimationmsa_NativeDraw_drawNative(JNIEnv *env, jclass type, jint width,
                                                     jint height, jobject buffer, jobject surface);
 
+JNIEXPORT void JNICALL
+Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type, jint width,
+                                                        jint height, jobject buffer,
+                                                        jobject surface, jfloatArray rvec_,
+                                                        jfloatArray tvec_);
+
 #ifdef __cplusplus
 }
 #endif

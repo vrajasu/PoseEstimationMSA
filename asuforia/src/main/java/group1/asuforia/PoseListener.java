@@ -8,6 +8,6 @@ import android.media.Image;
 
 public interface PoseListener {
 
-    public void onPose(Image image);
+    public void onPose(Image image,float[] rvecs,float[] tvces);
     public void textureAvailable();
 }

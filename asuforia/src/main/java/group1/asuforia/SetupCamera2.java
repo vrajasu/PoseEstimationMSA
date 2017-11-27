@@ -113,7 +113,7 @@ public class SetupCamera2
                     StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(
                             CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
-                    imageReader = ImageReader.newInstance(previewSize.getWidth(),previewSize.getHeight(),imageFormat,5);
+                    imageReader = ImageReader.newInstance(640,480,imageFormat,5);
                     imageReader.setOnImageAvailableListener(onImageAvailableListener,backgroundHandler);
                     this.cameraId = cameraId;
                 }
@@ -180,12 +180,33 @@ public class SetupCamera2
         @Override
         public void onImageAvailable(ImageReader reader) {
 
+            try {
+                Log.d("image count", "1");
+                Image img = reader.acquireNextImage();
+                float[] vectors = NativeCallMethods.nativePoseEstimation(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer());
 
-            Log.d("image count","1");
-            Image img= reader.acquireNextImage();
-            poseListener.onPose(img);
+                float rvecs[] = null;
+                float tvecs[] = null;
 
-            img.close();
+                if (vectors != null) {
+                    rvecs = new float[3];
+                    tvecs = new float[3];
+                    rvecs[0] = vectors[0];
+                    rvecs[1] = vectors[1];
+                    rvecs[2] = vectors[2];
+                    tvecs[0] = vectors[3];
+                    tvecs[1] = vectors[4];
+                    tvecs[2] = vectors[5];
+
+                }
+                poseListener.onPose(img, rvecs, tvecs);
+
+                img.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
 
         }
