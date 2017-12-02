@@ -113,7 +113,12 @@ public class SetupCamera2
                     StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(
                             CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
-                    imageReader = ImageReader.newInstance(640,480,imageFormat,5);
+                    Size[] sizes = streamConfigurationMap.getOutputSizes(imageFormat);
+                    for(int i=0;i<sizes.length;i++)
+                    {
+                        Log.d("Output Sizes ",""+sizes[i].getWidth()+" "+sizes[i].getHeight());
+                    }
+                    imageReader = ImageReader.newInstance(1280,720,imageFormat,5);
                     imageReader.setOnImageAvailableListener(onImageAvailableListener,backgroundHandler);
                     this.cameraId = cameraId;
                 }
@@ -140,7 +145,7 @@ public class SetupCamera2
     private void createPreviewSession() {
         try {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
+            surfaceTexture.setDefaultBufferSize(320,240);
             Surface previewSurface = new Surface(surfaceTexture);
             captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 //            captureRequestBuilder.addTarget(previewSurface);
@@ -174,6 +179,7 @@ public class SetupCamera2
             e.printStackTrace();
         }
     }
+    //camera 2 API to access images.
     private final ImageReader.OnImageAvailableListener onImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 
@@ -182,7 +188,7 @@ public class SetupCamera2
 
             try {
                 Log.d("image count", "1");
-                Image img = reader.acquireNextImage();
+                Image img = reader.acquireLatestImage();
                 float[] vectors = NativeCallMethods.nativePoseEstimation(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer());
 
                 float rvecs[] = null;

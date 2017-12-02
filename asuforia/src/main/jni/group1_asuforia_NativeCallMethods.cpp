@@ -24,6 +24,7 @@ JNIEXPORT jstring JNICALL Java_group1_asuforia_NativeCallMethods_getHelloNative
 
     return jstring("");
 }
+//executes when the application starts.
 JNIEXPORT void JNICALL
 Java_group1_asuforia_NativeCallMethods_generateReferenceImage(JNIEnv *env, jclass type,jstring path1) {
 
@@ -58,6 +59,7 @@ Java_group1_asuforia_NativeCallMethods_generateReferenceImage(JNIEnv *env, jclas
 
     return;
 }
+//this executes on every image frame. Note that we already have the values from the reference image stored as global variables.
 JNIEXPORT jfloatArray JNICALL
 Java_group1_asuforia_NativeCallMethods_nativePoseEstimation(JNIEnv *env, jclass type, jint srcWidth,
                                                             jint srcHeight, jobject srcBuffer) {

@@ -15,6 +15,7 @@ public class Asuforia {
     Surface surface;
     SetupCamera2 camera2 = new SetupCamera2();
 
+    //default constructor
     public Asuforia(PoseListener poseListener,String refImagePath,Surface surface)
     {
         this.poseListener = poseListener;

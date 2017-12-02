@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity{
     File mReferenceImage;
     Asuforia asuforia;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity{
 
         final Surface[] surface = new Surface[1];
 
-
+        //interface used to implement callback functions
         PoseListener poseListener = new PoseListener() {
             @Override
             public void onPose(Image image,float rvec[],float tvec[]) {
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity{
                 surface[0] =  new Surface(textureView.getSurfaceTexture());
             }
         };
+
         asuforia = new Asuforia(poseListener,mReferenceImage.getAbsolutePath(),surface[0]);
         asuforia.startEstimation(textureView,MainActivity.this,poseListener);
 
