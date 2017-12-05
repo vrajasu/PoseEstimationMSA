@@ -8,7 +8,9 @@ import java.nio.ByteBuffer;
 /**
  * Created by vrajdelhivala on 11/14/17.
  */
-
+// NativeDraw cass implements method called drawNative;
+// drawNative takes the given camera frame, rvec, tvec as arguments and draws a cube on top of it.
+//
 public class NativeDraw {
     static{
         System.loadLibrary("opendraw");

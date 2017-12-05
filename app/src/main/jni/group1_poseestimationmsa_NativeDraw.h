@@ -12,9 +12,13 @@ extern "C" {
  * Method:    getHello
  * Signature: ()Ljava/lang/String;
  */
+
 JNIEXPORT jstring JNICALL Java_group1_poseestimationmsa_NativeDraw_getHello
   (JNIEnv *, jclass);
 
+//Native method drawNativePose is implemented below
+//It gets height,weight of surface, surfaceView, rvec and tvec as inputs
+//It draws the cube on top of surface
 JNIEXPORT void JNICALL
 Java_group1_poseestimationmsa_NativeDraw_drawNative(JNIEnv *env, jclass type, jint width,
                                                     jint height, jobject buffer, jobject surface);

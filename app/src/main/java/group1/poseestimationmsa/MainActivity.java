@@ -29,17 +29,19 @@ import group1.asuforia.Asuforia;
 import group1.asuforia.PoseListener;
 import group1.asuforia.SetupCamera2;
 
+// Application life cycle starts in MainActivity.
+// Implements onCreate onPause onResume methods.
 public class MainActivity extends AppCompatActivity{
-
+    //As we need to draw cube on the captured frame we will use TestureView
     TextureView textureView;
     File mReferenceImage;
     Asuforia asuforia;
 
+    // on create load the reference image
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         textureView = (TextureView)findViewById(R.id.texureSurface);
 
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity{
             InputStream is = getResources().openRawResource(R.raw.reference);
 
             File cascadeDir = getDir("ref", Context.MODE_PRIVATE);
-
+            // find the absolute path of the reference image in android file system
             mReferenceImage = new File(cascadeDir, "referenceImage.jpg");
             FileOutputStream os = new FileOutputStream(mReferenceImage);
 
@@ -69,11 +71,13 @@ public class MainActivity extends AppCompatActivity{
 
         final Surface[] surface = new Surface[1];
 
-        //interface used to implement callback functions
+        //Create a PoseListner object, is used an interface with asuforia library
+        //Therefore implements callback functions, i.e onPose, textureAvailable
+        //onPose gets rvec and tvec and calls nativeDraw method
         PoseListener poseListener = new PoseListener() {
             @Override
             public void onPose(Image image,float rvec[],float tvec[]) {
-                // NativeDraw is used to draw virual cube
+                // NativeDraw is used to draw virual cube on the captured frame
                 NativeDraw.drawPose(image,surface[0],rvec,tvec);
             }
 
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity{
             }
         };
 
+        // instantiate the library module Asuforia, send the reference image path and
         asuforia = new Asuforia(poseListener,mReferenceImage.getAbsolutePath(),surface[0]);
         asuforia.startEstimation(textureView,MainActivity.this,poseListener);
 
