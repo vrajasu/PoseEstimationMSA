@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity{
         PoseListener poseListener = new PoseListener() {
             @Override
             public void onPose(Image image,float rvec[],float tvec[]) {
+                // NativeDraw is used to draw virual cube
                 NativeDraw.drawPose(image,surface[0],rvec,tvec);
             }
 
