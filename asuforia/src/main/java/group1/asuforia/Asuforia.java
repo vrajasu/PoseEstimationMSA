@@ -29,7 +29,8 @@ public class Asuforia {
     Surface surface;
     SetupCamera2 camera2 = new SetupCamera2();
 
-    //default constructor - poselistener is implemented in the application developer's main activity
+    // Default constructor - poselistener is implemented in
+    // the application developer's main activity
     public Asuforia(PoseListener poseListener,String refImagePath,Surface surface)
     {
         this.poseListener = poseListener;
@@ -38,6 +39,8 @@ public class Asuforia {
 
         NativeCallMethods.generateReferenceImage(refImagePath);
     }
+
+    // Capture the camera frame and estimate the pose
     public void startEstimation(TextureView textureView, Context context,PoseListener poseListener)
     {
         camera2.setup(textureView,context,poseListener);

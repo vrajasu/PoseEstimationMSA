@@ -29,7 +29,10 @@ import java.util.Collections;
  * Created by vrajdelhivala on 11/14/17.
  */
 
-//some try catch exceptions yet to done and the application assumes that you have given permissions 
+// This class captures the image from camera and calls the
+// NativePoseEstimation method to calculate rotation and
+// translation matrices
+
 public class SetupCamera2
 {
     CameraManager cameraManager;
@@ -49,17 +52,18 @@ public class SetupCamera2
     int imageFormat = ImageFormat.YUV_420_888;
     PoseListener poseListener;
 
+    // Size of the image
     Size imageSize = new Size(640,480);
 
     static {
         System.loadLibrary("asuforia");
     }
 
-
+    // Implements callbacks for camera
     public void setup(TextureView textureView, Context ctx, final PoseListener poseListener)
     {
-        this.textureView=textureView;
-        this.ctx =ctx;
+        this.textureView = textureView;
+        this.ctx = ctx;
         this.poseListener = poseListener;
 
         cameraManager = (CameraManager) ctx.getSystemService(Context.CAMERA_SERVICE);
@@ -87,6 +91,7 @@ public class SetupCamera2
 
             }
         };
+
         stateCallback = new CameraDevice.StateCallback() {
             @Override
             public void onOpened(CameraDevice cameraDevice) {
@@ -106,8 +111,11 @@ public class SetupCamera2
             }
         };
     }
+
     private void setUpCamera() {
         try {
+            // Select the back-facing camera and read the image specified by the imageSize
+            // The frame-buffer for images has 5 entries
             for (String cameraId : cameraManager.getCameraIdList()) {
                 CameraCharacteristics cameraCharacteristics =
                         cameraManager.getCameraCharacteristics(cameraId);
@@ -131,6 +139,7 @@ public class SetupCamera2
         }
     }
     private void openCamera() {
+        // Check if the app has Camera permissions. If yes, open camera
         Log.d("Permissions","Here1");
         try {
             if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA)
@@ -155,7 +164,6 @@ public class SetupCamera2
             surfaceTexture.setDefaultBufferSize(imageSize.getWidth(),imageSize.getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
             captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//            captureRequestBuilder.addTarget(previewSurface);
             captureRequestBuilder.addTarget(imageReader.getSurface());
 
             mCameraDevice.createCaptureSession(Arrays.asList(imageReader.getSurface()),
@@ -186,7 +194,8 @@ public class SetupCamera2
             e.printStackTrace();
         }
     }
-    //camera 2 API to access images.
+
+    // Camera 2 API to access images.
 
     float runningAverage = 0;
     int count = 0;
@@ -199,16 +208,20 @@ public class SetupCamera2
 
             try {
 
+                // Get the current image
                 Image img = reader.acquireLatestImage();
                 long startTime = System.currentTimeMillis();
                 long stopTime = 0;
                 long totalTime = 0;
 
+                // Call the nativePoseEstimation method to estimate the pose
                 float[] vectors = NativeCallMethods.nativePoseEstimation(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer());
 
+                // Rotation and translation vectors to be passed onto poseListener interface
                 float rvecs[] = null;
                 float tvecs[] = null;
 
+                // If nativePoseEstimation returned valid values store them!
                 if (vectors != null) {
                     rvecs = new float[3];
                     tvecs = new float[3];
@@ -220,6 +233,8 @@ public class SetupCamera2
                     tvecs[2] = vectors[5];
 
                 }
+
+                // Now that pose is available, let the app do its job! :D
                 poseListener.onPose(img, rvecs, tvecs);
 
                 img.close();
@@ -236,8 +251,6 @@ public class SetupCamera2
             {
                 e.printStackTrace();
             }
-
-
 
         }
 
@@ -282,8 +295,4 @@ public class SetupCamera2
             backgroundHandler = null;
         }
     }
-
-
-
-
 }
