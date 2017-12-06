@@ -9,6 +9,20 @@ import android.view.TextureView;
  * Created by vrajdelhivala on 11/26/17.
  */
 
+// The main library module of the Asuforia library.
+// This class implements the pose-estimation method
+// which returns the rotation and translation vectors.
+// This information is then used by the app to draw the
+// cube on the marker-image
+
+// Asuforia class has four member objects which are initialized
+// with the default constructor
+// poselistener -> This is the interface between library and app
+//                 Implementation to be provided by developer
+// refImagePath -> Path to the reference image
+// Surface      -> A Surface object
+// camera2      -> A camera2 API object
+
 public class Asuforia {
     PoseListener poseListener;
     String refImagePath = "";
