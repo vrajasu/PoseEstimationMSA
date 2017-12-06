@@ -16,8 +16,8 @@ using namespace std;
 vector<KeyPoint> keypointsReference;
 Mat descriptorsReference;
 vector<Point3f>  p3d;
-int numFeautresReference = 500;
-int numFeautresDest = 500;
+int numFeautresReference = 500; //reference
+int numFeautresDest = 500; //input or destination
 
 JNIEXPORT jstring JNICALL Java_group1_asuforia_NativeCallMethods_getHelloNative
   (JNIEnv *, jclass){

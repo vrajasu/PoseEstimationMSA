@@ -1,5 +1,6 @@
 package group1.asuforia;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -47,6 +48,8 @@ public class SetupCamera2
     ImageReader imageReader;
     int imageFormat = ImageFormat.YUV_420_888;
     PoseListener poseListener;
+
+    Size imageSize = new Size(640,480);
 
     static {
         System.loadLibrary("asuforia");
@@ -118,7 +121,7 @@ public class SetupCamera2
                     {
                         Log.d("Output Sizes ",""+sizes[i].getWidth()+" "+sizes[i].getHeight());
                     }
-                    imageReader = ImageReader.newInstance(1280,720,imageFormat,5);
+                    imageReader = ImageReader.newInstance(imageSize.getWidth(),imageSize.getHeight(),imageFormat,5);
                     imageReader.setOnImageAvailableListener(onImageAvailableListener,backgroundHandler);
                     this.cameraId = cameraId;
                 }
@@ -128,11 +131,15 @@ public class SetupCamera2
         }
     }
     private void openCamera() {
+        Log.d("Permissions","Here1");
         try {
-            if (ActivityCompat.checkSelfPermission(ctx, android.Manifest.permission.CAMERA)
+            if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Permissions","Here1");
                 cameraManager.openCamera(cameraId, stateCallback, backgroundHandler);
             }
+            else
+                Log.d("Permissions","Here2");
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -145,7 +152,7 @@ public class SetupCamera2
     private void createPreviewSession() {
         try {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(320,240);
+            surfaceTexture.setDefaultBufferSize(imageSize.getWidth(),imageSize.getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
             captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 //            captureRequestBuilder.addTarget(previewSurface);
@@ -180,6 +187,10 @@ public class SetupCamera2
         }
     }
     //camera 2 API to access images.
+
+    float runningAverage = 0;
+    int count = 0;
+
     private final ImageReader.OnImageAvailableListener onImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 
@@ -187,8 +198,12 @@ public class SetupCamera2
         public void onImageAvailable(ImageReader reader) {
 
             try {
-                Log.d("image count", "1");
+
                 Image img = reader.acquireLatestImage();
+                long startTime = System.currentTimeMillis();
+                long stopTime = 0;
+                long totalTime = 0;
+
                 float[] vectors = NativeCallMethods.nativePoseEstimation(img.getWidth(), img.getHeight(), img.getPlanes()[0].getBuffer());
 
                 float rvecs[] = null;
@@ -208,11 +223,20 @@ public class SetupCamera2
                 poseListener.onPose(img, rvecs, tvecs);
 
                 img.close();
+                stopTime=System.currentTimeMillis();
+
+                totalTime=stopTime-startTime;
+
+                count ++;
+                Log.d("ImageCount",""+count);
+                runningAverage=(runningAverage*1.00f*(count-1)+totalTime)/count;
+                Log.d("ExecutionTime",""+runningAverage);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
+
 
 
         }

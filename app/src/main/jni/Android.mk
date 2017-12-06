@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-OPENCV_ROOT:=/home/gunman/Downloads/software/OpenCV-android-sdk/
+OPENCV_ROOT:=/Users/vrajdelhivala/Downloads/OpenCV-android-sdk-3.2.0
 OPENCV_CAMERA_MODULES:=on
 OPENCV_INSTALL_MODULES:=on
 OPENCV_LIB_TYPE:=SHARED
