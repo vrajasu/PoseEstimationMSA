@@ -15,7 +15,9 @@
 using namespace cv;
 using namespace std;
 
-
+//Native method drawNativePose is implemented below
+//It gets height,weight of surface, surfaceView, rvec and tvec as inputs
+//It draws the cube on top of surface
 JNIEXPORT void JNICALL
 Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type, jint srcWidth,
                                                         jint srcHeight, jobject srcBuffer,
