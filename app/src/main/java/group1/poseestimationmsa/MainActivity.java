@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
 
         textureView = (TextureView)findViewById(R.id.texureSurface);
 
+        //loading the reference image from assests folder to android file system. this is done so that the c++ code can access the image using its absolute path
         try{
             InputStream is = getResources().openRawResource(R.raw.reference);
 

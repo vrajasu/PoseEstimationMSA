@@ -15,7 +15,7 @@ public class Asuforia {
     Surface surface;
     SetupCamera2 camera2 = new SetupCamera2();
 
-    //default constructor
+    //default constructor - poselistener is implemented in the application developer's main activity
     public Asuforia(PoseListener poseListener,String refImagePath,Surface surface)
     {
         this.poseListener = poseListener;
