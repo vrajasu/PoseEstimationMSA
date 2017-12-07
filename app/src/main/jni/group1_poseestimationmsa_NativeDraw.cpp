@@ -15,15 +15,16 @@
 using namespace cv;
 using namespace std;
 
-//Native method drawNativePose is implemented below
-//It gets height,weight of surface, surfaceView, rvec and tvec as inputs
-//It draws the cube on top of surface
+// Native method drawNativePose is implemented below
+// It gets height,weight of surface, surfaceView, rvec and tvec as inputs
+// It draws the cube on top of surface
 JNIEXPORT void JNICALL
 Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type, jint srcWidth,
                                                         jint srcHeight, jobject srcBuffer,
                                                         jobject dstSurface, jfloatArray rvec_,
                                                         jfloatArray tvec_) {
 
+    // Read the rotation and translation vectors
     jfloat *rvec,*tvec;
 
     if(rvec_!=NULL)
@@ -32,14 +33,14 @@ Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type
     if(tvec_!=NULL)
         tvec = env->GetFloatArrayElements(tvec_, NULL);
 
+    // The input image buffer
     uint8_t *srcLumaPtr = reinterpret_cast<uint8_t *>(env->GetDirectBufferAddress(srcBuffer));
 
     int dstWidth;
     int dstHeight;
 
-    cv::Mat mYuv(srcHeight+srcHeight/2, srcWidth, CV_8UC1, srcLumaPtr); //getting all channels for display
-    cv::Mat mYuvGray(srcHeight,srcWidth,CV_8UC1,srcLumaPtr); //only getting the luma channel
-
+    cv::Mat mYuv(srcHeight+srcHeight/2, srcWidth, CV_8UC1, srcLumaPtr); // Getting all channels for display
+    cv::Mat mYuvGray(srcHeight,srcWidth,CV_8UC1,srcLumaPtr); // Only getting the luma channel
 
     ANativeWindow *win = ANativeWindow_fromSurface(env, dstSurface);
     ANativeWindow_acquire(win);
@@ -48,10 +49,9 @@ Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type
     dstWidth = srcHeight;
     dstHeight = srcWidth;
 
-
     ANativeWindow_setBuffersGeometry(win, dstWidth, dstHeight, 0 );
 
-    //acquiring a lock on the SurfaceView to render the processed image
+    // Acquiring a lock on the SurfaceView to render the processed image
     if (int32_t err = ANativeWindow_lock(win, &buf, NULL)) {
         LOGE("ANativeWindow_lock failed with error code %d\n", err);
         ANativeWindow_unlockAndPost(win);
@@ -74,15 +74,16 @@ Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type
 
     if(rvec_!=NULL && tvec_!=NULL){
 
+        // cx, cy -> co-ordinates of the center of the image
+        // fx, fy -> co-ordinates of the focal point
         const double cx = mYuvGray.rows/2;
         const double cy = mYuvGray.cols/2;
-        const double fx = 1.73*cx;
-        const double fy=1.73*cy;
+        const double fx = 1.73 * cx;
+        const double fy = 1.73 * cy;
 
         std::vector<cv::Point3d> pointAxesForCube;
         std::vector<cv::Point2d> pointsImage;
         std::vector<cv::Point2d> pointsImagesRoof;
-
 
         int axisLength = 5;
 
@@ -102,7 +103,6 @@ Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type
         double transdata[3]={double(tvec[0]),double(tvec[1]),double(tvec[2])};
 
         cv::Mat rotVec = cv::Mat(3, 1, CV_64F, rotVecdata);
-
         cv::Mat transVec = cv::Mat(3, 1, CV_64F, transdata);
 
         cv::projectPoints(pointAxesForCube, rotVec, transVec, K, cv::Mat::zeros(5, 1, CV_64F),
@@ -116,7 +116,7 @@ Java_group1_poseestimationmsa_NativeDraw_drawNativePose(JNIEnv *env, jclass type
         for(int i=4;i<8;i++){
             pointsImagesRoof.push_back(pointsImage[i]);
         }
-        //drawing the floor of the box
+        // Drawing the floor of the box
         drawContours(colorRgba,pointsImageFloor, -1, (255, 0, 0), CV_FILLED,LINE_8);
 
         for(int i=0;i<4;i++){

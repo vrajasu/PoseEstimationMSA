@@ -29,15 +29,17 @@ import group1.asuforia.Asuforia;
 import group1.asuforia.PoseListener;
 import group1.asuforia.SetupCamera2;
 
+// Main activity for the App:
 // Application life cycle starts in MainActivity.
 // Implements onCreate onPause onResume methods.
+
 public class MainActivity extends AppCompatActivity{
-    //As we need to draw cube on the captured frame we will use TestureView
+    // As we need to draw cube on the captured frame we will use TextureView
     TextureView textureView;
     File mReferenceImage;
     Asuforia asuforia;
 
-    // on create load the reference image
+    // Loads the reference images on application launch (needs to be done only once!)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +47,15 @@ public class MainActivity extends AppCompatActivity{
 
         textureView = (TextureView)findViewById(R.id.texureSurface);
 
-        //loading the reference image from assests folder to android file system. this is done so that the c++ code can access the image using its absolute path
+        // loading the reference image from assests folder to android file system.
+        // This is done so that the c++ code can access the image using its absolute path
+
         try{
             InputStream is = getResources().openRawResource(R.raw.reference);
 
             File cascadeDir = getDir("ref", Context.MODE_PRIVATE);
-            // find the absolute path of the reference image in android file system
+
+            // Get the absolute path of the reference image in android file system
             mReferenceImage = new File(cascadeDir, "referenceImage.jpg");
             FileOutputStream os = new FileOutputStream(mReferenceImage);
 
@@ -72,12 +77,14 @@ public class MainActivity extends AppCompatActivity{
 
         final Surface[] surface = new Surface[1];
 
-        //Create a PoseListner object, is used an interface with asuforia library
-        //Therefore implements callback functions, i.e onPose, textureAvailable
-        //onPose gets rvec and tvec and calls nativeDraw method
+        // Create a PoseListner object which is used an interface with Asuforia library.
+        // Therefore, implements callback functions i.e onPose, and textureAvailable.
+        //
+        // onPose -> gets rvec and tvec and calls nativeDraw method
         PoseListener poseListener = new PoseListener() {
             @Override
             public void onPose(Image image,float rvec[],float tvec[]) {
+                // Once the pose estimations is available,
                 // NativeDraw is used to draw virual cube on the captured frame
                 NativeDraw.drawPose(image,surface[0],rvec,tvec);
             }
@@ -88,7 +95,9 @@ public class MainActivity extends AppCompatActivity{
             }
         };
 
-        // instantiate the library module Asuforia, send the reference image path and
+        // Instantiate the library module Asuforia.
+        // This object is created with the path of the reference image, the surface, and the
+        // object of the poseListener interface.
         asuforia = new Asuforia(poseListener,mReferenceImage.getAbsolutePath(),surface[0]);
         asuforia.startEstimation(textureView,MainActivity.this,poseListener);
 
