@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
 import android.view.autofill.AutofillManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity{
     TextureView textureView;
     File mReferenceImage;
     Asuforia asuforia;
+    Button btn_estimation;
 
     // Loads the reference images on application launch (needs to be done only once!)
     @Override
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         textureView = (TextureView)findViewById(R.id.texureSurface);
+        btn_estimation =(Button)findViewById(R.id.btn_estimation);
+
+
 
         // loading the reference image from assests folder to android file system.
         // This is done so that the c++ code can access the image using its absolute path
@@ -81,7 +87,7 @@ public class MainActivity extends AppCompatActivity{
         // Therefore, implements callback functions i.e onPose, and textureAvailable.
         //
         // onPose -> gets rvec and tvec and calls nativeDraw method
-        PoseListener poseListener = new PoseListener() {
+        final PoseListener poseListener = new PoseListener() {
             @Override
             public void onPose(Image image,float rvec[],float tvec[]) {
                 // Once the pose estimations is available,
@@ -100,6 +106,24 @@ public class MainActivity extends AppCompatActivity{
         // object of the poseListener interface.
         asuforia = new Asuforia(poseListener,mReferenceImage.getAbsolutePath(),surface[0]);
         asuforia.startEstimation(textureView,MainActivity.this,poseListener);
+//
+
+        btn_estimation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = btn_estimation.getText().toString();
+                if(text.equals("Start Estimation"))
+                {
+                    asuforia.onForeground();
+                    btn_estimation.setText("Stop Estimation");
+                }
+                else
+                    {
+                    asuforia.endEstimation();
+                    btn_estimation.setText("Start Estimation");
+                }
+            }
+        });
 
     }
 

@@ -53,5 +53,6 @@ public class Asuforia {
     {
         camera2.onBackground();
     }
+    public void endEstimation(){ camera2.onBackground(); }
 
 }
