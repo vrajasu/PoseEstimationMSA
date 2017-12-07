@@ -53,7 +53,7 @@ public class SetupCamera2
     PoseListener poseListener;
 
     // Size of the image
-    Size imageSize = new Size(640,480);
+    Size imageSize = new Size(1280,720);
 
     static {
         System.loadLibrary("asuforia");

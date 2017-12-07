@@ -57,9 +57,11 @@ Java_group1_asuforia_NativeCallMethods_generateReferenceImage(JNIEnv *env, jclas
 
     // cx, cy -> co-ordinates of the center of the image
     // fx, fy -> co-ordinates of the focal point
+    //heightAbove => an estimated parameter tuned to get accurate X and Y points in 3d world.
+    // Tuned by observing values of tvecs in z-axis
     const double heightAbove = 25.0;
-    const double cx = referenceImage.rows/2;
-    const double cy = referenceImage.cols/2;
+    const double cx = referenceImage.cols/2;
+    const double cy = referenceImage.rows/2;
     const double fx = cx * 1.73;
     const double fy = cy * 1.73;
 
